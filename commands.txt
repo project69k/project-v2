@@ -87,6 +87,33 @@ http://localhost:8080/
 http.request.method == "GET"
 
 
+----------------------------------------------------------
+sudo service apache2 start
+sudo service mysql start
+
+http://127.0.0.1/dvwa
+http://127.0.0.1/dvwa/
+http://127.0.0.1/
+http://127.0.0.1/dvwa/index.php
+http://127.0.0.1/dvwa/vulnerabilities/brute/
+
+Username: admin
+Password: password
+
+Username: admin
+Password: admin
+
+Username: admin
+Password: 123456
+
+Username: admin
+Password: password
+
+PHPSESSID copy it 
+
+Ctrl + Shift + P
+F5
+paste the id
 
 
 CODES 
@@ -209,4 +236,5 @@ public static void main(String[] args){
             System.out.println(result);
         } 
 }
+
 }
